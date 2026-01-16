@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>人生格子 · Life Grid (V12)</title>
+  <title>LifeGrid Lite（自动列数 · 月视图）</title>
   <style>
     :root{
       --bg:#0b1220;
@@ -11,18 +11,15 @@
       --muted:#a6b6ffcc;
       --border:#22315f;
 
-      --green:#2ecc71;
-      --gray:#6d768c;
-
-      --milestone:#f1c40f;
-      --reminder:#ff4d4f;
+      --future:#2ecc71;
+      --past:#6d768c;
 
       --cell:12px;
       --gap:2px;
-      --cols:52;
+      --cols:48;
       --bug:26px;
 
-      --card: rgba(255,255,255,.06);
+      --card: rgba(255,255,255,.07);
       --card2: rgba(255,255,255,.04);
     }
     *{box-sizing:border-box}
@@ -34,27 +31,29 @@
         radial-gradient(1000px 550px at 92% 0%, #1b6b52 0%, transparent 58%),
         var(--bg);
       color:var(--text);
-      overflow:auto;
+      overflow:hidden;
     }
     header{
-      padding:14px 16px 8px;
-      max-width:1240px;
+      max-width:1200px;
       margin:0 auto;
+      padding:14px 16px 10px;
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
     }
-    h1{margin:0; font-size:18px; letter-spacing:.3px}
-    .sub{margin-top:6px; color:var(--muted); font-size:12px; line-height:1.45}
+    h1{margin:0; font-size:16px; letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:12px}
 
     .wrap{
-      max-width:1240px;
+      max-width:1200px;
       margin:0 auto;
-      padding:0 16px 18px;
+      padding:0 16px 16px;
+      height: calc(100vh - 56px);
       display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:12px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .wrap{grid-template-columns:1fr;}
+      grid-template-rows: auto 1fr auto;
+      gap:10px;
     }
 
     .card{
@@ -64,184 +63,63 @@
       padding:12px;
       backdrop-filter: blur(8px);
       box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
-    .left{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .sectionTitle{
-      font-size:13px;
-      margin:0 0 10px;
-      color:#d9e2ff;
-      letter-spacing:.2px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .badge{
-      font-size:11px;
-      color:var(--muted);
-      padding:2px 8px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.12);
+      overflow:hidden;
     }
 
-    label{display:block; font-size:12px; color:var(--muted); margin:9px 0 6px;}
-    input, select{
-      width:100%;
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:flex-end;
+      flex-wrap:wrap;
+    }
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px;}
+    input{
       padding:9px 10px;
       border-radius:12px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(0,0,0,.16);
       color:var(--text);
       outline:none;
+      min-width:180px;
     }
-    input:focus, select:focus{ border-color: rgba(46,204,113,.7); box-shadow: 0 0 0 3px rgba(46,204,113,.12); }
-    .row{display:flex; gap:10px; align-items:center;}
-    .row > *{flex:1}
-    .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    input:focus{ border-color: rgba(46,204,113,.7); box-shadow: 0 0 0 3px rgba(46,204,113,.12); }
     button{
       cursor:pointer;
       border:none;
       padding:9px 12px;
       border-radius:12px;
-      color:var(--text);
-      background:#1f2e5a;
-      border:1px solid rgba(255,255,255,.10);
-      font-size:12px;
-    }
-    button.primary{
-      background: linear-gradient(180deg, rgba(46,204,113,.95), rgba(30,160,86,.95));
       color:#071f12;
+      background: linear-gradient(180deg, rgba(46,204,113,.95), rgba(30,160,86,.95));
       font-weight:800;
-    }
-    button.ghost{
-      background: rgba(0,0,0,.12);
-      border:1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-    }
-    button.danger{
-      background: rgba(255,77,79,.18);
-      border:1px solid rgba(255,77,79,.35);
-      color:#ffd9d9;
-    }
-
-    .legend{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
       font-size:12px;
-      color:var(--muted);
-      margin-top:8px;
-    }
-    .dot{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:6px;border:1px solid rgba(255,255,255,.15)}
-    .dot.green{background:var(--green)}
-    .dot.gray{background:var(--gray)}
-    .dot.mile{background:var(--milestone)}
-    .dot.rem{background:var(--reminder)}
-
-    .listBox{
       border:1px solid rgba(255,255,255,.10);
-      border-radius:14px;
-      padding:8px;
-      background:rgba(0,0,0,.12);
-      max-height:240px;
-      overflow:auto;
+      white-space:nowrap;
     }
-    .item{
+    .stat{
+      margin-left:auto;
+      color:var(--muted);
+      font-size:12px;
       display:flex;
-      gap:10px;
-      align-items:flex-start;
-      justify-content:space-between;
-      padding:8px 8px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.10);
-      margin-bottom:8px;
-    }
-    .item:last-child{margin-bottom:0}
-    .meta{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      min-width:0;
-    }
-    .meta .top{
-      display:flex;
-      gap:8px;
-      align-items:center;
+      gap:12px;
       flex-wrap:wrap;
+      align-items:center;
     }
     .pill{
-      font-size:11px;
-      padding:2px 8px;
+      padding:3px 8px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.10);
-      color: var(--muted);
-    }
-    .pill.mile{ color:#fff2b2; border-color: rgba(241,196,15,.45); background: rgba(241,196,15,.10); }
-    .pill.rem{  color:#ffd0d0; border-color: rgba(255,77,79,.45); background: rgba(255,77,79,.10); }
-    .pill.eff{  color:#dbe4ff; border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.06); }
-
-    .meta .text{
-      font-size:12px;
-      color:#dbe4ff;
-      line-height:1.35;
-      word-break:break-word;
-    }
-    .meta .date{
-      font-size:12px;
-      color:var(--muted);
-    }
-    .iconBtn{
-      width:32px; height:32px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.12);
-      color: var(--muted);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      flex:0 0 auto;
-    }
-    .iconBtn:hover{ border-color: rgba(255,255,255,.22); color:#fff; }
-
-    .right{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      min-width:0;
     }
 
-    .vizHead{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:8px;
-    }
-    .titleLine{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;}
-    .titleLine .big{font-size:13px;color:#d9e2ff}
-    .titleLine .small{font-size:12px;color:var(--muted)}
-
+    /* Main grid */
     .gridWrap{
       position:relative;
+      height:100%;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.12);
       padding:10px;
-      overflow:auto;
-      height: 420px;
-    }
-    @media (max-width: 980px){
-      .gridWrap{height: 360px;}
+      overflow:auto; /* scroll when lots of months */
     }
     .grid{
       position:relative;
@@ -249,34 +127,18 @@
       grid-template-columns: repeat(var(--cols), var(--cell));
       grid-auto-rows: var(--cell);
       gap: var(--gap);
-      width: max-content;
+      width: max-content; /* allow horizontal if needed */
       height: max-content;
     }
     .cell{
       width:var(--cell);
       height:var(--cell);
       border-radius:4px;
-      background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.05);
-      position:relative;
-      transition: outline .15s ease, transform .15s ease;
+      background: rgba(255,255,255,.08);
     }
-    .cell.past{ background: var(--gray); }
-    .cell.future{ background: var(--green); }
-    .cell.milestone{ background: var(--milestone) !important; }
-    .cell.reminder{ background: var(--reminder) !important; }
-    .cell.yearSep{ outline: 1px solid rgba(255,255,255,.14); outline-offset:0; }
-    .cell.milestone::after,
-    .cell.reminder::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:4px;
-      opacity:1;
-    }
-    .cell.milestone::after{ background: rgba(241,196,15,.85); }
-    .cell.reminder::after{ background: rgba(255,77,79,.78); }
-    .cell:hover{ outline:1px solid rgba(255,255,255,.25); outline-offset:1px; transform: translateY(-1px); }
+    .cell.past{ background: var(--past); }
+    .cell.future{ background: var(--future); }
 
     .bug{
       position:absolute;
@@ -284,7 +146,7 @@
       width:var(--bug);
       height:var(--bug);
       pointer-events:none;
-      transform: translate3d(var(--x), var(--y), 0) rotate(var(--r));
+      transform: translate3d(var(--x), var(--y), 0);
       transform-origin: 50% 55%;
       transition: transform 120ms linear;
       filter: drop-shadow(0 8px 10px rgba(0,0,0,.35));
@@ -292,127 +154,32 @@
     }
     .bug .breathe{
       width:100%; height:100%;
-      animation: breathe 2.6s infinite ease-in-out;
+      animation: breathe 2.4s infinite ease-in-out;
     }
     @keyframes breathe{
       0%{transform: scale(1)}
       50%{transform: scale(1.06)}
       100%{transform: scale(1)}
     }
-    .bug .svg{width:100%; height:100%; display:block;}
-    .bug .wiggle{ animation: wiggle 700ms infinite ease-in-out; transform-origin: 50% 70%; }
+    .svg{width:100%; height:100%; display:block;}
+    .wiggle{ animation: wiggle 700ms infinite ease-in-out; transform-origin: 50% 70%; }
     @keyframes wiggle{
       0%{ transform: rotate(-6deg) }
       50%{ transform: rotate(6deg) }
       100%{ transform: rotate(-6deg) }
     }
 
-    .bottomRow{
-      display:grid;
-      grid-template-columns: 1fr 340px;
-      gap:10px;
-      align-items:stretch;
-    }
-    @media (max-width: 980px){
-      .bottomRow{grid-template-columns:1fr;}
-    }
-
-    .detailWrap{
-      position:relative;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.12);
-      padding:10px;
-      overflow:auto;
-      height: 320px;
-    }
-
-    .detailHead{
+    /* Time bars */
+    .clockWrap{ display:grid; gap:10px; }
+    .clockHead{
       display:flex;
       justify-content:space-between;
-      align-items:baseline;
       gap:10px;
-      margin-bottom:8px;
       flex-wrap:wrap;
-    }
-    .detailHead .t{color:#d9e2ff; font-size:13px}
-    .detailHead .s{color:var(--muted); font-size:12px}
-
-    .weekday{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap:6px;
-      margin-bottom:6px;
-      color: var(--muted);
-      font-size:11px;
-      min-width: 520px;
-    }
-    .weekday div{ text-align:center; padding:2px 0; }
-
-    .calGrid{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap:6px;
-      align-content:start;
-      min-width: 520px;
-    }
-    .dcell{
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.06);
-      background: rgba(255,255,255,.08);
-      position:relative;
-      min-height:34px;
-      padding:6px 6px 6px;
-      overflow:hidden;
-    }
-    .dcell.blank{
-      background: transparent;
-      border:1px dashed rgba(255,255,255,.06);
-      opacity:.35;
-    }
-    .dcell.past{ background: rgba(109,118,140,.85); }
-    .dcell.future{ background: rgba(46,204,113,.85); }
-    .dcell.milestone{ background: rgba(241,196,15,.90) !important; }
-    .dcell.reminder{ background: rgba(255,77,79,.90) !important; }
-
-    .dcell.milestone::after,
-    .dcell.reminder::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:10px;
-      opacity:1;
-    }
-    .dcell.milestone::after{ background: rgba(241,196,15,.85); }
-    .dcell.reminder::after{ background: rgba(255,77,79,.78); }
-
-    .dcell .num{
-      position:relative;
-      z-index:2;
-      font-size:11px;
-      color: rgba(255,255,255,.92);
-    }
-    .dcell.blank .num{display:none}
-
-    .bug.detail{
-      width:22px; height:22px;
-      filter: drop-shadow(0 6px 8px rgba(0,0,0,.25));
-      z-index:6;
-    }
-
-    .clockWrap{
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.12);
-      padding:10px;
-      height: 320px;
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+      align-items:baseline;
     }
     .clockTitle{color:#d9e2ff; font-size:13px}
-    .clockRow{display:flex; flex-direction:column; gap:6px}
+    .nowTxt{color:var(--muted); font-size:12px}
     .barWrap{ position:relative; }
     .bar{
       position:relative;
@@ -420,6 +187,8 @@
       gap:2px;
       width:100%;
       height:16px;
+      border-radius:10px;
+      overflow:hidden;
     }
     .barCell{
       border-radius:4px;
@@ -428,6 +197,7 @@
     }
     .barCell.past{ background: rgba(109,118,140,.85); }
     .barCell.future{ background: rgba(46,204,113,.85); }
+
     .barBug{
       position:absolute;
       top:-20px;
@@ -440,936 +210,248 @@
       z-index:5;
     }
     .barBug .breathe{width:100%;height:100%; animation:breathe 2.2s infinite ease-in-out;}
-    .smallTxt{color:var(--muted); font-size:12px}
-  
-    header{
-      padding:14px 16px 8px;
-      max-width:1240px;
-      margin:0 auto;
-    }
-    .headRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .helpBtn{
-      cursor:pointer;
-      border:none;
-      padding:8px 10px;
-      border-radius:12px;
-      color:var(--text);
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
-      font-size:12px;
-      backdrop-filter: blur(8px);
-    }
-    .helpBtn:hover{ border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.10); }
-
-    /* Modal */
-    .modalMask{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:999;
-      padding:16px;
-    }
-    .modalMask.show{ display:flex; }
-    .modal{
-      width:min(860px, 100%);
-      max-height: min(84vh, 900px);
-      overflow:auto;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.14);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      backdrop-filter: blur(10px);
-    }
-    .modalHead{
-      position:sticky; top:0;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:12px 14px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background: rgba(10,16,30,.55);
-      backdrop-filter: blur(10px);
-    }
-    .modalHead .t{ font-size:14px; color:#d9e2ff; font-weight:700; }
-    .modalBody{ padding:14px; color:#dbe4ff; font-size:13px; line-height:1.55; }
-    .modalBody h3{ margin:14px 0 8px; font-size:13px; color:#e9efff; }
-    .modalBody .muted{ color: var(--muted); font-size:12px; }
-    .modalActions{
-      display:flex; gap:10px; flex-wrap:wrap;
-      padding:12px 14px 14px;
-      border-top:1px solid rgba(255,255,255,.10);
-    }
-    .modalClose{
-      width:34px; height:34px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.12);
-      color: var(--muted);
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer;
-    }
-    .modalClose:hover{ color:#fff; border-color: rgba(255,255,255,.22); }
-
-    /* Onboarding */
-    .onbMask{
-      position:fixed; inset:0;
-      z-index:1000;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      background:
-        radial-gradient(900px 520px at 15% 10%, rgba(31,46,106,.75) 0%, transparent 60%),
-        radial-gradient(900px 520px at 85% 0%, rgba(27,107,82,.65) 0%, transparent 60%),
-        rgba(5,9,18,.85);
-      backdrop-filter: blur(10px);
-    }
-    .onbMask.show{ display:flex; }
-    .onb{
-      width:min(920px, 100%);
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.14);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
-      box-shadow: 0 20px 70px rgba(0,0,0,.55);
-      overflow:hidden;
-    }
-    .onbTop{
-      padding:14px 16px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background: rgba(10,16,30,.45);
-    }
-    .onbTop .brand{ font-weight:800; letter-spacing:.2px; color:#e9efff; }
-    .onbSteps{ display:flex; gap:6px; }
-    .stepDot{ width:10px; height:10px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); }
-    .stepDot.on{ background: rgba(46,204,113,.90); border-color: rgba(46,204,113,.40); }
-    .onbBody{ padding:18px; display:grid; grid-template-columns: 1.1fr .9fr; gap:16px; align-items:center; }
-    @media (max-width: 860px){
-      .onbBody{ grid-template-columns:1fr; }
-    }
-    .onbH{ font-size:22px; margin:0 0 10px; }
-    .onbP{ margin:0; color:#dbe4ff; line-height:1.6; }
-    .onbCard{
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.16);
-      padding:16px;
-      min-height:210px;
-      position:relative;
-      overflow:hidden;
-    }
-    .onbMiniGrid{
-      display:grid;
-      grid-template-columns: repeat(13, 12px);
-      grid-auto-rows: 12px;
-      gap:3px;
-      opacity:.9;
-    }
-    .onbMiniGrid div{
-      border-radius:4px;
-      border:1px solid rgba(255,255,255,.06);
-      background: rgba(255,255,255,.10);
-    }
-    .onbMiniGrid .g{ background: rgba(46,204,113,.85); }
-    .onbMiniGrid .x{ background: rgba(109,118,140,.85); }
-    .onbMiniGrid .m{ background: rgba(241,196,15,.92); }
-    .onbMiniGrid .r{ background: rgba(255,77,79,.92); }
-    .onbBug{
-      position:absolute; right:18px; bottom:18px;
-      width:34px; height:34px;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.35));
-      animation: onbFloat 2.4s infinite ease-in-out;
-    }
-    @keyframes onbFloat{
-      0%{ transform: translateY(0) }
-      50%{ transform: translateY(-6px) }
-      100%{ transform: translateY(0) }
-    }
-    .onbBottom{
-      padding:14px 16px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      border-top:1px solid rgba(255,255,255,.10);
-      background: rgba(10,16,30,.35);
-    }
-    .onbBottom .hint{ color:var(--muted); font-size:12px; }
-
+    .hint{color:var(--muted); font-size:12px; margin-top:4px}
   </style>
 </head>
 <body>
 <header>
-  <div class="headRow">
-    <h1>人生格子 · Life Grid（V12）</h1>
-    <button class="helpBtn" id="helpBtn" title="帮助">ℹ️ 帮助</button>
-  </div>
-  <div class="sub">点击右上角 <b>ℹ️ 帮助</b> 查看使用说明与隐私说明。</div>
+  <h1>LifeGrid Lite（自动列数 · 月视图）</h1>
+  <div class="sub">每格=1个月 · 🐞代表此刻 · 主窗口可滚动</div>
 </header>
 
 <div class="wrap">
-  <div class="left">
-    <div class="card">
-      <div class="sectionTitle">主人物档案 <span class="badge">Profile</span></div>
-
-      <label>选择档案</label>
-      <select id="profileSelect"></select>
-
-      <div class="btns">
-        <button id="newProfileBtn">新建档案</button>
-        <button class="ghost" id="renameProfileBtn">重命名</button>
-        <button class="danger" id="deleteProfileBtn">删除档案</button>
+  <div class="card">
+    <div class="controls">
+      <div>
+        <label>生日</label>
+        <input id="dob" type="date" />
       </div>
-
-      <hr style="border:none;border-top:1px solid rgba(255,255,255,.10); margin:12px 0;">
-
-      <label>生日</label>
-      <input id="dob" type="date" />
-
-      <div class="row">
-        <div>
-          <label>预期寿命（年）</label>
-          <input id="lifeYears" type="number" min="1" max="150" step="1" value="90" />
-        </div>
-        <div>
-          <label>主窗口粒度</label>
-          <select id="unit">
-            <option value="years">年（1格/年）</option>
-            <option value="months">月（12格/年）</option>
-            <option value="weeks" selected>周（52格/年）</option>
-          </select>
-        </div>
+      <div>
+        <label>预期寿命（年）</label>
+        <input id="lifeYears" type="number" min="1" max="150" step="1" value="90" />
       </div>
+      <button id="renderBtn">生成 / 刷新</button>
 
-      <label>每行格子数（仅布局）</label>
-      <input id="cols" type="number" min="6" max="120" step="1" value="52" />
-
-      <div class="btns">
-        <button class="primary" id="renderBtn">生成 / 刷新</button>
-        <button class="ghost" id="replayBtn">回放“爬行”</button>
-        <button id="pauseBtn" disabled>暂停</button>
-        <button id="saveProfileBtn">保存到当前档案</button>
+      <div class="stat">
+        <span class="pill" id="pMonths">—</span>
+        <span class="pill" id="pLeft">—</span>
       </div>
-
-      <div class="legend">
-        <span><i class="dot gray"></i>过去</span>
-        <span><i class="dot green"></i>未来</span>
-        <span><i class="dot mile"></i>里程碑</span>
-        <span><i class="dot rem"></i>提醒</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="sectionTitle">添加里程碑 / 提醒</div>
-      <div class="row">
-        <div>
-          <label>日期</label>
-          <input id="mDate" type="date" />
-        </div>
-        <div>
-          <label>类型</label>
-          <select id="mType">
-            <option value="milestone" selected>里程碑（黄）</option>
-            <option value="reminder">提醒（红）</option>
-          </select>
-        </div>
-      </div>
-      <label>内容</label>
-      <input id="mText" placeholder="例如：结婚 / 旅行 / 纪念日 / 体检..." />
-      <div class="btns">
-        <button id="addMarkBtn">添加</button>
-        <button class="danger" id="clearMarksBtn">清空本档案事件</button>
-      </div>
-      <div class="smallTxt">提示：事件与档案绑定（切换档案会切换事件）。</div>
-    </div>
-
-    <div class="card">
-      <div class="sectionTitle">当前范围的事件</div>
-      <div class="listBox" id="markList"></div>
     </div>
   </div>
 
-  <div class="right">
-    <div class="card">
-      <div class="vizHead">
-        <div class="titleLine">
-          <div class="big" id="vizTitle">主窗口</div>
-          <div class="small" id="vizSub">—</div>
-        </div>
-        <div class="small" style="color:var(--muted); font-size:12px">点击任意格子 → 下方日历细节</div>
-      </div>
-
-      <div class="gridWrap" id="gridWrap">
-        <div class="grid" id="grid"></div>
-
-        <div class="bug" id="bug" style="--r: 0deg; --x:0px; --y:0px;">
-          <div class="breathe">
-            <div class="wiggle">
-              <svg class="svg" viewBox="0 0 100 100" aria-hidden="true">
-                <circle cx="76" cy="50" r="12" fill="#101018"/>
-                <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
-                <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
-                <circle cx="36" cy="42" r="4" fill="#111"/>
-                <circle cx="30" cy="58" r="4" fill="#111"/>
-                <circle cx="56" cy="42" r="4" fill="#111"/>
-                <circle cx="62" cy="58" r="4" fill="#111"/>
-                <path d="M82 42 C90 34,94 30,96 26" stroke="#111" stroke-width="3" fill="none"/>
-                <path d="M82 58 C90 66,94 70,96 74" stroke="#111" stroke-width="3" fill="none"/>
-              </svg>
-            </div>
+  <div class="card" style="padding:12px;">
+    <div class="gridWrap" id="gridWrap">
+      <div class="grid" id="grid"></div>
+      <div class="bug" id="bug" style="--x:0px; --y:0px;">
+        <div class="breathe">
+          <div class="wiggle">
+            <svg class="svg" viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="76" cy="50" r="12" fill="#101018"/>
+              <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
+              <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
+              <circle cx="36" cy="42" r="4" fill="#111"/>
+              <circle cx="30" cy="58" r="4" fill="#111"/>
+              <circle cx="56" cy="42" r="4" fill="#111"/>
+              <circle cx="62" cy="58" r="4" fill="#111"/>
+              <path d="M82 42 C90 34,94 30,96 26" stroke="#111" stroke-width="3" fill="none"/>
+              <path d="M82 58 C90 66,94 70,96 74" stroke="#111" stroke-width="3" fill="none"/>
+            </svg>
           </div>
         </div>
       </div>
     </div>
+    <div class="hint">提示：窗口变大/变小时，列数会自动调整以尽量填满宽度。</div>
+  </div>
 
-    <div class="bottomRow">
-      <div class="card">
-        <div class="detailHead">
-          <div class="t" id="detailTitle">细节窗口（日历）</div>
-          <div class="s" id="detailSub">点击上方格子选择范围</div>
-        </div>
-
-        <div class="row" style="margin-bottom:10px">
-          <div>
-            <label style="margin:0 0 6px;">细节月份</label>
-            <select id="detailMonth"></select>
-          </div>
-          <div>
-            <label style="margin:0 0 6px;">细节年份</label>
-            <select id="detailYear"></select>
-          </div>
-        </div>
-
-        <div class="detailWrap" id="detailWrap">
-          <div class="weekday">
-            <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div>
-          </div>
-          <div class="calGrid" id="detailGrid"></div>
-
-          <div class="bug detail" id="detailBug" style="--r:0deg; display:none; --x:0px; --y:0px;">
-            <div class="breathe">
-              <svg class="svg" viewBox="0 0 100 100" aria-hidden="true">
-                <circle cx="76" cy="50" r="12" fill="#101018"/>
-                <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
-                <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
-                <circle cx="36" cy="42" r="4" fill="#111"/>
-                <circle cx="30" cy="58" r="4" fill="#111"/>
-                <circle cx="56" cy="42" r="4" fill="#111"/>
-                <circle cx="62" cy="58" r="4" fill="#111"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card clockWrap">
+  <div class="card">
+    <div class="clockWrap">
+      <div class="clockHead">
         <div class="clockTitle">今天的时间条</div>
+        <div class="nowTxt" id="nowTxt">—</div>
+      </div>
 
-        <div class="clockRow">
-          <div class="smallTxt">24小时</div>
-          <div class="barWrap">
-            <div class="bar" id="barDay"></div>
-            <div class="barBug" id="bugDay" style="--x:0px;">
-              <div class="breathe">
-                <svg class="svg" viewBox="0 0 100 100">
-                  <circle cx="76" cy="50" r="12" fill="#101018"/>
-                  <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
-                  <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
-                  <circle cx="36" cy="42" r="4" fill="#111"/>
-                  <circle cx="30" cy="58" r="4" fill="#111"/>
-                  <circle cx="56" cy="42" r="4" fill="#111"/>
-                  <circle cx="62" cy="58" r="4" fill="#111"/>
-                </svg>
-              </div>
+      <div>
+        <div class="hint" style="margin:0 0 6px;">24小时</div>
+        <div class="barWrap">
+          <div class="bar" id="barDay"></div>
+          <div class="barBug" id="bugDay" style="--x:0px;">
+            <div class="breathe">
+              <svg class="svg" viewBox="0 0 100 100">
+                <circle cx="76" cy="50" r="12" fill="#101018"/>
+                <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
+                <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
+                <circle cx="36" cy="42" r="4" fill="#111"/>
+                <circle cx="30" cy="58" r="4" fill="#111"/>
+                <circle cx="56" cy="42" r="4" fill="#111"/>
+                <circle cx="62" cy="58" r="4" fill="#111"/>
+              </svg>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="clockRow">
-          <div class="smallTxt">60分钟</div>
-          <div class="barWrap">
-            <div class="bar" id="barHour"></div>
-            <div class="barBug" id="bugHour" style="--x:0px;">
-              <div class="breathe">
-                <svg class="svg" viewBox="0 0 100 100">
-                  <circle cx="76" cy="50" r="12" fill="#101018"/>
-                  <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
-                  <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
-                  <circle cx="36" cy="42" r="4" fill="#111"/>
-                  <circle cx="30" cy="58" r="4" fill="#111"/>
-                  <circle cx="56" cy="42" r="4" fill="#111"/>
-                  <circle cx="62" cy="58" r="4" fill="#111"/>
-                </svg>
-              </div>
+      <div>
+        <div class="hint" style="margin:0 0 6px;">60分钟</div>
+        <div class="barWrap">
+          <div class="bar" id="barHour"></div>
+          <div class="barBug" id="bugHour" style="--x:0px;">
+            <div class="breathe">
+              <svg class="svg" viewBox="0 0 100 100">
+                <circle cx="76" cy="50" r="12" fill="#101018"/>
+                <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
+                <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
+                <circle cx="36" cy="42" r="4" fill="#111"/>
+                <circle cx="30" cy="58" r="4" fill="#111"/>
+                <circle cx="56" cy="42" r="4" fill="#111"/>
+                <circle cx="62" cy="58" r="4" fill="#111"/>
+              </svg>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="clockRow">
-          <div class="smallTxt">60秒</div>
-          <div class="barWrap">
-            <div class="bar" id="barMin"></div>
-            <div class="barBug" id="bugMin" style="--x:0px;">
-              <div class="breathe">
-                <svg class="svg" viewBox="0 0 100 100">
-                  <circle cx="76" cy="50" r="12" fill="#101018"/>
-                  <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
-                  <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
-                  <circle cx="36" cy="42" r="4" fill="#111"/>
-                  <circle cx="30" cy="58" r="4" fill="#111"/>
-                  <circle cx="56" cy="42" r="4" fill="#111"/>
-                  <circle cx="62" cy="58" r="4" fill="#111"/>
-                </svg>
-              </div>
+      <div>
+        <div class="hint" style="margin:0 0 6px;">60秒</div>
+        <div class="barWrap">
+          <div class="bar" id="barMin"></div>
+          <div class="barBug" id="bugMin" style="--x:0px;">
+            <div class="breathe">
+              <svg class="svg" viewBox="0 0 100 100">
+                <circle cx="76" cy="50" r="12" fill="#101018"/>
+                <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
+                <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
+                <circle cx="36" cy="42" r="4" fill="#111"/>
+                <circle cx="30" cy="58" r="4" fill="#111"/>
+                <circle cx="56" cy="42" r="4" fill="#111"/>
+                <circle cx="62" cy="58" r="4" fill="#111"/>
+              </svg>
             </div>
           </div>
         </div>
-
-        <div class="smallTxt" id="nowTxt">—</div>
       </div>
     </div>
   </div>
+
 </div>
 
 <script>
   const $ = (id)=>document.getElementById(id);
-
-  const gridEl = $("grid");
-  const gridWrapEl = $("gridWrap");
-  const bugEl = $("bug");
-
-  const detailGridEl = $("detailGrid");
-  const detailBugEl = $("detailBug");
-  const detailWrapEl = $("detailWrap");
-  const detailMonthEl = $("detailMonth");
-  const detailYearEl  = $("detailYear");
-
   const DAY_MS = 24*60*60*1000;
 
+  const gridWrap = $("gridWrap");
+  const gridEl = $("grid");
+  const bugEl = $("bug");
+
   let cells = [];
-  let cellRanges = [];
-  let totalUnits = 0;
-  let livedUnits = 0;
-  let layoutCols = 52;
-
-  let selectedRange = null;
-
-  let replayTimer = null;
-  let replayIndex = 0;
-  let replayMode = false;
-
-  const PROFILES_KEY = "life_grid_v5_profiles";
-  let profiles = loadProfiles();
-  let currentProfileId = profiles[0]?.id || null;
-
-  let marks = [];
+  let totalMonths = 0;
+  let livedMonths = 0;
+  let cols = 48;
 
   function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
   function fmt2(n){ return String(n).padStart(2,"0"); }
-  function formatDate(d){ return `${d.getFullYear()}-${fmt2(d.getMonth()+1)}-${fmt2(d.getDate())}`; }
   function parseDate(s){ const d=new Date(s); d.setHours(0,0,0,0); return d; }
   function startOfToday(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
 
-  function daysBetween(a,b){
-    const aa=new Date(a); aa.setHours(0,0,0,0);
-    const bb=new Date(b); bb.setHours(0,0,0,0);
-    return Math.floor((bb-aa)/DAY_MS);
-  }
   function monthDiff(d1,d2){
     let months = (d2.getFullYear()-d1.getFullYear())*12 + (d2.getMonth()-d1.getMonth());
     if (d2.getDate() < d1.getDate()) months -= 1;
     return Math.max(0, months);
   }
-  function yearsDiff(d1,d2){
-    let years = d2.getFullYear()-d1.getFullYear();
-    const hasHadBirthday = (d2.getMonth()>d1.getMonth()) || (d2.getMonth()===d1.getMonth() && d2.getDate()>=d1.getDate());
-    if (!hasHadBirthday) years -= 1;
-    return Math.max(0, years);
-  }
-  function unitsPerYear(unit){
-    if (unit === "weeks") return 52;
-    if (unit === "months") return 12;
-    return 1;
-  }
-  function livedByUnit(dob, today, unit){
-    const livedDays = Math.max(0, daysBetween(dob, today));
-    if (unit === "weeks") return Math.floor(livedDays/7);
-    if (unit === "months") return monthDiff(dob, today);
-    return yearsDiff(dob, today);
-  }
 
-  function uid(){
-    return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
-  }
-
-  function defaultProfile(){
-    const d = new Date(); d.setFullYear(d.getFullYear()-32);
-    return {
-      id: uid(),
-      name: "我的人生",
-      data: {
-        dob: formatDate(d),
-        lifeYears: 90,
-        unit: "months",
-        cols: 52,
-        marks: []
-      }
-    }
-  }
-  function loadProfiles(){
-    try{
-      const raw = localStorage.getItem(PROFILES_KEY);
-      if (!raw){
-        const p = defaultProfile();
-        localStorage.setItem(PROFILES_KEY, JSON.stringify([p]));
-        return [p];
-      }
-      const arr = JSON.parse(raw);
-      if (!Array.isArray(arr) || !arr.length){
-        const p = defaultProfile();
-        localStorage.setItem(PROFILES_KEY, JSON.stringify([p]));
-        return [p];
-      }
-      return arr.map(x=>({
-        id: x.id || uid(),
-        name: x.name || "未命名",
-        data: x.data || {}
-      }));
-    }catch(e){
-      const p = defaultProfile();
-      localStorage.setItem(PROFILES_KEY, JSON.stringify([p]));
-      return [p];
-    }
-  }
-  function saveProfiles(){
-    localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
-  }
-  function getCurrentProfile(){
-    return profiles.find(p=>p.id===currentProfileId) || profiles[0];
-  }
-  function syncProfileSelect(){
-    const sel = $("profileSelect");
-    sel.innerHTML = "";
-    for (const p of profiles){
-      const opt = document.createElement("option");
-      opt.value = p.id;
-      opt.textContent = p.name;
-      sel.appendChild(opt);
-    }
-    sel.value = currentProfileId || profiles[0].id;
-  }
-  function loadProfileIntoUI(p){
-    currentProfileId = p.id;
-    $("dob").value = p.data.dob || $("dob").value;
-    $("lifeYears").value = p.data.lifeYears ?? 90;
-    $("unit").value = p.data.unit || "weeks";
-    $("cols").value = p.data.cols ?? 52;
-    marks = Array.isArray(p.data.marks) ? p.data.marks : [];
-    selectedRange = null;
-    refreshAll();
-  }
-  function saveUIIntoProfile(){
-    const p = getCurrentProfile();
-    p.data = {
-      dob: $("dob").value,
-      lifeYears: clamp(parseInt($("lifeYears").value,10) || 90, 1, 150),
-      unit: $("unit").value,
-      cols: clamp(parseInt($("cols").value,10) || 52, 6, 120),
-      marks: marks.slice(0, 500)
-    };
-    saveProfiles();
-  }
-
-  function computeMainCellAndBugSize(rows){
-    const cols = layoutCols;
+  function autoCols(){
+    // Choose a target cell size and compute columns to fit the container width
     const gap = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--gap"), 10) || 2;
     const pad = 10;
-    const wrapW = gridWrapEl.clientWidth - pad*2 - 16;
-    const wrapH = gridWrapEl.clientHeight - pad*2 - 16;
+    const w = gridWrap.clientWidth - pad*2 - 8;
+    const target = 12; // px target size
+    let c = Math.floor((w + gap) / (target + gap));
+    c = clamp(c, 12, 120);
+    cols = c;
+    document.documentElement.style.setProperty("--cols", cols);
+  }
+
+  function computeCellAndBug(rows){
+    const gap = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--gap"), 10) || 2;
+    const pad = 10;
+    const wrapW = gridWrap.clientWidth - pad*2 - 8;
+    const wrapH = gridWrap.clientHeight - pad*2 - 8;
+
+    // Fit by width/height, but prioritize filling width nicely.
     const cellByW = (wrapW - gap*(cols-1)) / cols;
     const cellByH = (wrapH - gap*(rows-1)) / rows;
     const cell = clamp(Math.floor(Math.min(cellByW, cellByH)), 7, 18);
+
     document.documentElement.style.setProperty("--cell", `${cell}px`);
     const bug = clamp(Math.floor(cell * 1.6), 20, 34);
     document.documentElement.style.setProperty("--bug", `${bug}px`);
   }
 
-  function buildUnitRange(dob, unit, idx){
-    if (unit === "years"){
-      const start = new Date(dob);
-      start.setFullYear(dob.getFullYear() + idx);
-      start.setHours(0,0,0,0);
-      const end = new Date(start); end.setFullYear(start.getFullYear()+1);
-      end.setHours(0,0,0,0);
-      return {start, end};
-    }
-    if (unit === "months"){
-      const start = new Date(dob.getFullYear(), dob.getMonth()+idx, 1);
-      start.setHours(0,0,0,0);
-      const end = new Date(start.getFullYear(), start.getMonth()+1, 1);
-      end.setHours(0,0,0,0);
-      return {start, end};
-    }
-    const start = new Date(dob.getTime() + idx*7*DAY_MS);
-    start.setHours(0,0,0,0);
-    const end = new Date(start.getTime() + 7*DAY_MS);
-    end.setHours(0,0,0,0);
-    return {start, end};
-  }
-
-  function buildMainGrid(dob, lifeYears, unit){
+  function buildGrid(dob, lifeYears){
     gridEl.innerHTML = "";
     cells = [];
-    cellRanges = [];
 
-    layoutCols = clamp(parseInt($("cols").value, 10) || 52, 6, 120);
-    document.documentElement.style.setProperty("--cols", layoutCols);
-
-    const perYear = unitsPerYear(unit);
-    totalUnits = lifeYears * perYear;
-    const rows = Math.ceil(totalUnits / layoutCols);
-
-    computeMainCellAndBugSize(rows);
+    autoCols();
+    totalMonths = clamp(lifeYears,1,150) * 12;
+    const rows = Math.ceil(totalMonths / cols);
+    computeCellAndBug(rows);
 
     const frag = document.createDocumentFragment();
-    for(let i=0;i<totalUnits;i++){
+    for(let i=0;i<totalMonths;i++){
       const c = document.createElement("div");
       c.className = "cell";
-      c.dataset.index = String(i);
-      if (unit !== "years" && (i % perYear === 0)) c.classList.add("yearSep");
       frag.appendChild(c);
       cells.push(c);
-      cellRanges.push(buildUnitRange(dob, unit, i));
     }
     gridEl.appendChild(frag);
-
-    const unitLabel = unit==="weeks" ? "周" : unit==="months" ? "月" : "年";
-    $("vizTitle").textContent = `主窗口（每格=1${unitLabel}）`;
-    $("vizSub").textContent = `总 ${totalUnits} 格 · ${layoutCols} 列（可滚动）`;
-
-    gridEl.onclick = (ev)=>{
-      const t = ev.target;
-      if (!t.classList.contains("cell")) return;
-      const idx = parseInt(t.dataset.index,10);
-      onMainCellClick(unit, idx);
-    };
   }
 
-  function marksOnDay(dateStr){
-    return marks.filter(m=>m.date===dateStr);
-  }
-  function dayHasBoth(dateStr){
-    const list = marksOnDay(dateStr);
-    return list.some(m=>m.type==="milestone") && list.some(m=>m.type==="reminder");
-  }
-
-  function dayDisplayClass(dateStr, today){
-    const list = marksOnDay(dateStr);
-    if (!list.length) return null;
-    const hasM = list.some(m=>m.type==="milestone");
-    const hasR = list.some(m=>m.type==="reminder");
-    if (hasM && !hasR) return "milestone";
-    if (!hasM && hasR) return "reminder";
-    const d = parseDate(dateStr);
-    if (d.getTime() < today.getTime()) return "milestone";
-    return "reminder";
-  }
-
-  function rangeDisplayClass(range, today){
-    let seenM=false, seenR=false;
-    for (const mk of marks){
-      const d = parseDate(mk.date);
-      if (d.getTime() >= range.start.getTime() && d.getTime() < range.end.getTime()){
-        const cls = dayDisplayClass(mk.date, today);
-        if (cls==="reminder") seenR=true;
-        if (cls==="milestone") seenM=true;
-      }
-    }
-    if (seenR) return "reminder";
-    if (seenM) return "milestone";
-    return null;
-  }
-
-  function paintMain(pastCount, today){
-    for(let i=0;i<cells.length;i++){
+  function paint(){
+    for (let i=0;i<cells.length;i++){
       const c = cells[i];
-      c.classList.toggle("past", i < pastCount);
-      c.classList.toggle("future", i >= pastCount);
-      c.classList.remove("milestone","reminder");
+      c.classList.toggle("past", i < livedMonths);
+      c.classList.toggle("future", i >= livedMonths);
     }
-    for(let i=0;i<cells.length;i++){
-      const cls = rangeDisplayClass(cellRanges[i], today);
-      if (cls) cells[i].classList.add(cls);
-    }
+    $("pMonths").textContent = `已走过：${livedMonths} 个月`;
+    $("pLeft").textContent = `剩余：${Math.max(0,totalMonths - livedMonths)} 个月`;
   }
 
-  function placeBugOnMain(index, extraCurve=true){
+  function placeBug(){
     if (!cells.length) return;
-    const i = clamp(index, 0, cells.length-1);
-    const cell = cells[i];
+    const idx = clamp(livedMonths, 0, cells.length-1);
+    const cell = cells[idx];
 
-    const wrapRect = gridWrapEl.getBoundingClientRect();
+    const wrapRect = gridWrap.getBoundingClientRect();
     const cellRect = cell.getBoundingClientRect();
 
     const cellSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--cell"),10);
     const bugSize  = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--bug"),10);
 
-    let cx = (cellRect.left - wrapRect.left) + (cellSize/2 - bugSize/2) + gridWrapEl.scrollLeft;
-    let cy = (cellRect.top  - wrapRect.top ) + (cellSize/2 - bugSize/2) + gridWrapEl.scrollTop;
+    let x = (cellRect.left - wrapRect.left) + (cellSize/2 - bugSize/2) + gridWrap.scrollLeft;
+    let y = (cellRect.top  - wrapRect.top ) + (cellSize/2 - bugSize/2) + gridWrap.scrollTop;
 
-    if (extraCurve){
-      const t = performance.now()/520;
-      const amp = Math.max(1, Math.floor(cellSize*0.10));
-      cx += Math.sin(t) * amp;
-      cy += Math.cos(t*1.3) * amp;
-    }
+    const t = performance.now()/520;
+    const amp = Math.max(1, Math.floor(cellSize*0.10));
+    x += Math.sin(t) * amp;
+    y += Math.cos(t*1.25) * amp;
 
-    const r = replayMode && Math.random() < 0.06 ? "180deg" : "0deg";
-    bugEl.style.setProperty("--x", `${cx}px`);
-    bugEl.style.setProperty("--y", `${cy}px`);
-    bugEl.style.setProperty("--r", r);
+    bugEl.style.setProperty("--x", `${x}px`);
+    bugEl.style.setProperty("--y", `${y}px`);
   }
 
-  function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
-
-  function populateDetailYearMonth(dob, lifeYears){
-    detailYearEl.innerHTML = "";
-    const y0 = dob.getFullYear();
-    const y1 = y0 + lifeYears;
-    for (let y=y0; y<=y1; y++){
-      const opt = document.createElement("option");
-      opt.value = String(y);
-      opt.textContent = String(y);
-      detailYearEl.appendChild(opt);
-    }
-    detailMonthEl.innerHTML = "";
-    for (let m=1;m<=12;m++){
-      const opt = document.createElement("option");
-      opt.value = String(m);
-      opt.textContent = `${m}月`;
-      detailMonthEl.appendChild(opt);
-    }
-  }
-
-  function setDetailYM(y,m){
-    detailYearEl.value = String(y);
-    detailMonthEl.value = String(m);
-  }
-  function getDetailYM(){
-    return { y: parseInt(detailYearEl.value,10), m: parseInt(detailMonthEl.value,10) };
-  }
-
-  function onMainCellClick(unit, idx){
-    const range = cellRanges[idx];
+  function refresh(){
+    const dobVal = $("dob").value;
+    if (!dobVal) return;
+    const dob = parseDate(dobVal);
     const today = startOfToday();
-
-    // If the clicked cell actually contains "today" (e.g., a week spans two months),
-    // always show today's month/year in the calendar so the ladybug is visible there.
-    let y, m;
-    if (today.getTime() >= range.start.getTime() && today.getTime() < range.end.getTime()){
-      y = today.getFullYear();
-      m = today.getMonth()+1;
-    } else {
-      y = range.start.getFullYear();
-      m = range.start.getMonth()+1;
-    }
-
-    // For year-view cells, keep the behavior: show current month if it's the current year; otherwise January.
-    if (unit === "years"){
-      m = (y === today.getFullYear()) ? (today.getMonth()+1) : 1;
-    }
-
-    selectedRange = {year:y, month:m};
-    setDetailYM(y,m);
-    renderDetailCalendar(y,m,today);
-    renderMarkListForMonth(y,m,today);
-  }
-
-  function renderDetailCalendar(y, m, today){
-    const start = new Date(y, m-1, 1); start.setHours(0,0,0,0);
-    const end   = new Date(y, m, 1);   end.setHours(0,0,0,0);
-
-    $("detailTitle").textContent = `${y}-${fmt2(m)} 月（日历）`;
-    $("detailSub").textContent = `范围：${formatDate(start)} ~ ${formatDate(new Date(end.getTime()-DAY_MS))}`;
-
-    detailGridEl.innerHTML = "";
-
-    const daysInMonth = daysBetween(start, end);
-    const firstDow = mondayIndex(start.getDay());
-    const totalCells = Math.ceil((firstDow + daysInMonth) / 7) * 7;
-
-    const todayStr = formatDate(today);
-    let todayCellEl = null;
-
-    for (let i=0;i<totalCells;i++){
-      const cell = document.createElement("div");
-      cell.className = "dcell";
-
-      const dayNum = i - firstDow + 1;
-      if (dayNum < 1 || dayNum > daysInMonth){
-        cell.classList.add("blank");
-        cell.innerHTML = `<div class="num"></div>`;
-        detailGridEl.appendChild(cell);
-        continue;
-      }
-
-      const d = new Date(start.getTime() + (dayNum-1)*DAY_MS);
-      const dStr = formatDate(d);
-
-      cell.title = dStr;
-      cell.innerHTML = `<div class="num">${dayNum}</div>`;
-
-      if (d.getTime() < today.getTime()) cell.classList.add("past");
-      else cell.classList.add("future");
-
-      const cls = dayDisplayClass(dStr, today);
-      if (cls) cell.classList.add(cls);
-
-      detailGridEl.appendChild(cell);
-      if (dStr === todayStr) todayCellEl = cell;
-    }
-
-    if (todayCellEl){
-      detailBugEl.style.display = "block";
-      requestAnimationFrame(()=> placeDetailBug(todayCellEl));
-    } else {
-      detailBugEl.style.display = "none";
-    }
-  }
-
-  function placeDetailBug(cellEl){
-    const hostRect = detailWrapEl.getBoundingClientRect();
-    const cellRect = cellEl.getBoundingClientRect();
-    const bugSize = 22;
-    const x = (cellRect.left - hostRect.left) + (cellRect.width/2 - bugSize/2) + detailWrapEl.scrollLeft;
-    const y = (cellRect.top  - hostRect.top ) + (cellRect.height/2 - bugSize/2) + detailWrapEl.scrollTop;
-    detailBugEl.style.setProperty("--x", `${x}px`);
-    detailBugEl.style.setProperty("--y", `${y}px`);
-    detailBugEl.style.setProperty("--r", "0deg");
-  }
-
-  function escapeHtml(s){
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  function renderMarkListForMonth(y,m,today){
-    const start = new Date(y, m-1, 1); start.setHours(0,0,0,0);
-    const end   = new Date(y, m, 1);   end.setHours(0,0,0,0);
-
-    const box = $("markList");
-    box.innerHTML = "";
-
-    const list = marks
-      .filter(mk=>{
-        const d = parseDate(mk.date);
-        return d.getTime() >= start.getTime() && d.getTime() < end.getTime();
-      })
-      .sort((a,b)=>a.date.localeCompare(b.date));
-
-    if (!list.length){
-      box.innerHTML = `<div class="smallTxt">（此月份没有事件）</div>`;
-      return;
-    }
-
-    for (const mk of list){
-      const pillCls = mk.type === "reminder" ? "rem" : "mile";
-      const pillText = mk.type === "reminder" ? "提醒" : "里程碑";
-
-      const conflict = dayHasBoth(mk.date);
-      const effective = conflict ? dayDisplayClass(mk.date, today) : mk.type;
-      const effText = conflict ? (effective==="reminder" ? "该日最终显示：提醒(红)" : "该日最终显示：里程碑(黄)") : "";
-
-      const item = document.createElement("div");
-      item.className = "item";
-
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      meta.innerHTML = `
-        <div class="top">
-          <span class="pill ${pillCls}">${pillText}</span>
-          <span class="date">${mk.date}</span>
-          ${conflict ? `<span class="pill eff">${effText}</span>` : ``}
-        </div>
-        <div class="text">${escapeHtml(mk.text)}</div>
-      `;
-
-      const del = document.createElement("button");
-      del.className = "iconBtn";
-      del.title = "删除";
-      del.innerHTML = "✕";
-      del.onclick = ()=>{
-        marks = marks.filter(x=>x.id !== mk.id);
-        saveUIIntoProfile();
-        refreshAll();
-      };
-
-      item.appendChild(meta);
-      item.appendChild(del);
-      box.appendChild(item);
-    }
-  }
-
-  function stopReplay(){
-    if (replayTimer){ clearInterval(replayTimer); replayTimer = null; }
-    $("pauseBtn").disabled = true;
-    replayMode = false;
-  }
-  function startReplay(){
-    stopReplay();
-    replayMode = true;
-    replayIndex = 0;
-
-    const dob = parseDate($("dob").value);
-    const today = startOfToday();
-    const unit = $("unit").value;
     const lifeYears = clamp(parseInt($("lifeYears").value,10) || 90, 1, 150);
-    const perYear = unitsPerYear(unit);
-    livedUnits = clamp(livedByUnit(dob, today, unit), 0, lifeYears*perYear);
 
-    buildMainGrid(dob, lifeYears, unit);
-    paintMain(0, today);
-    placeBugOnMain(0, true);
-
-    $("pauseBtn").disabled = false;
-
-    replayTimer = setInterval(()=>{
-      if (Math.random() < 0.07){
-        placeBugOnMain(replayIndex, true);
-        return;
-      }
-      if (Math.random() < 0.05 && replayIndex > 3) replayIndex -= 1;
-      else replayIndex += 1;
-
-      replayIndex = clamp(replayIndex, 0, livedUnits);
-
-      paintMain(replayIndex, today);
-      placeBugOnMain(replayIndex, true);
-
-      if (replayIndex >= livedUnits){
-        stopReplay();
-        paintMain(livedUnits, today);
-        placeBugOnMain(livedUnits, true);
-      }
-    }, 45);
+    buildGrid(dob, lifeYears);
+    livedMonths = clamp(monthDiff(dob, today), 0, totalMonths);
+    paint();
+    placeBug();
   }
 
-  function addMark(dateStr, text, type){
-    if (!dateStr || !text) return;
-    const t = (type === "reminder") ? "reminder" : "milestone";
-    marks.push({id: uid(), date: dateStr, text: text.trim(), type: t});
-    marks = marks.filter(m=>m.date && m.text).sort((a,b)=>a.date.localeCompare(b.date)).slice(0, 500);
-  }
-
+  // Time bars
   function buildBar(el, n){
     el.innerHTML = "";
     el.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
@@ -1393,429 +475,39 @@
     }
     const cell = cells[clamp(idx,0,n-1)];
     if (!cell) return;
-
     const barRect = barEl.getBoundingClientRect();
     const cellRect = cell.getBoundingClientRect();
-
     const x = (cellRect.left - barRect.left) + (cellRect.width/2 - 11);
     bugEl.style.setProperty("--x", `${x}px`);
   }
 
-  function tickClocks(){
+  function tick(){
     const now = new Date();
     const hh = now.getHours();
     const mm = now.getMinutes();
     const ss = now.getSeconds();
+
     $("nowTxt").textContent = `当前时间：${now.getFullYear()}-${fmt2(now.getMonth()+1)}-${fmt2(now.getDate())}  ${fmt2(hh)}:${fmt2(mm)}:${fmt2(ss)}`;
 
     placeBarBug($("barDay"), $("bugDay"), hh, 24);
     placeBarBug($("barHour"), $("bugHour"), mm, 60);
     placeBarBug($("barMin"), $("bugMin"), ss, 60);
 
-    if (!replayTimer) placeBugOnMain(livedUnits, true);
-
-    if (detailBugEl.style.display !== "none"){
-      const today = startOfToday();
-      const todayStr = formatDate(today);
-      for (const el of detailGridEl.children){
-        if (el.title === todayStr){
-          placeDetailBug(el);
-          break;
-        }
-      }
-    }
-  }
-  setInterval(tickClocks, 1000);
-  setTimeout(tickClocks, 80);
-
-  function refreshAll(){
-    const dob = parseDate($("dob").value);
-    const today = startOfToday();
-    const unit = $("unit").value;
-    const lifeYears = clamp(parseInt($("lifeYears").value,10) || 90, 1, 150);
-
-    buildMainGrid(dob, lifeYears, unit);
-
-    const perYear = unitsPerYear(unit);
-    livedUnits = clamp(livedByUnit(dob, today, unit), 0, lifeYears*perYear);
-
-    paintMain(livedUnits, today);
-    placeBugOnMain(livedUnits, true);
-
-    // Preserve the user's calendar focus across dropdown rebuilds
-    let keepY, keepM;
-    if (selectedRange){
-      keepY = selectedRange.year;
-      keepM = selectedRange.month;
-    } else {
-      keepY = today.getFullYear();
-      keepM = today.getMonth()+1;
-      selectedRange = {year: keepY, month: keepM};
-    }
-
-    populateDetailYearMonth(dob, lifeYears);
-
-    // Clamp kept year/month into available range
-    const minY = dob.getFullYear();
-    const maxY = dob.getFullYear() + lifeYears;
-    keepY = clamp(keepY, minY, maxY);
-    keepM = clamp(keepM, 1, 12);
-
-    selectedRange = {year: keepY, month: keepM};
-    setDetailYM(keepY, keepM);
-
-    renderDetailCalendar(keepY, keepM, today);
-    renderMarkListForMonth(keepY, keepM, today);
+    placeBug();
   }
 
-  $("renderBtn").addEventListener("click", ()=>{ stopReplay(); refreshAll(); });
-  $("replayBtn").addEventListener("click", ()=> startReplay());
-  $("pauseBtn").addEventListener("click", ()=> stopReplay());
+  $("renderBtn").addEventListener("click", refresh);
+  gridWrap.addEventListener("scroll", placeBug);
+  window.addEventListener("resize", refresh);
 
-  $("addMarkBtn").addEventListener("click", ()=>{
-    const ds = $("mDate").value;
-    const tx = $("mText").value;
-    if (!ds || !tx) return;
+  setInterval(tick, 1000);
+  setTimeout(tick, 60);
 
-    // After adding an event, keep the calendar focused on the event's month (instead of jumping back to today).
-    const d = parseDate(ds);
-    selectedRange = { year: d.getFullYear(), month: d.getMonth()+1 };
-    setDetailYM(selectedRange.year, selectedRange.month);
-
-    addMark(ds, tx, $("mType").value);
-    $("mText").value = "";
-    saveUIIntoProfile();
-    refreshAll();
-  });
-
-  $("clearMarksBtn").addEventListener("click", ()=>{
-    marks = [];
-    saveUIIntoProfile();
-    refreshAll();
-  });
-
-  $("saveProfileBtn").addEventListener("click", ()=>{
-    saveUIIntoProfile();
-    $("saveProfileBtn").textContent = "已保存 ✓";
-    setTimeout(()=> $("saveProfileBtn").textContent = "保存到当前档案", 900);
-  });
-
-  $("profileSelect").addEventListener("change", (e)=>{
-    stopReplay();
-    const id = e.target.value;
-    currentProfileId = id;
-    const p = getCurrentProfile();
-    loadProfileIntoUI(p);
-  });
-
-  $("newProfileBtn").addEventListener("click", ()=>{
-    const name = prompt("新档案名称：", "新的人生");
-    if (!name) return;
-    const p = defaultProfile();
-    p.name = name.trim() || p.name;
-    profiles.push(p);
-    currentProfileId = p.id;
-    saveProfiles();
-    syncProfileSelect();
-    loadProfileIntoUI(p);
-  });
-
-  $("renameProfileBtn").addEventListener("click", ()=>{
-    const p = getCurrentProfile();
-    const name = prompt("重命名档案：", p.name);
-    if (!name) return;
-    p.name = name.trim() || p.name;
-    saveProfiles();
-    syncProfileSelect();
-  });
-
-  $("deleteProfileBtn").addEventListener("click", ()=>{
-    if (profiles.length <= 1){
-      alert("至少保留一个档案。");
-      return;
-    }
-    const p = getCurrentProfile();
-    const ok = confirm(`确定删除档案「${p.name}」？此操作不可撤销。`);
-    if (!ok) return;
-    profiles = profiles.filter(x=>x.id !== p.id);
-    currentProfileId = profiles[0].id;
-    saveProfiles();
-    syncProfileSelect();
-    loadProfileIntoUI(getCurrentProfile());
-  });
-
-  detailMonthEl.addEventListener("change", ()=>{
-    const today = startOfToday();
-    const {y,m} = getDetailYM();
-    selectedRange = {year:y, month:m};
-    renderDetailCalendar(y,m,today);
-    renderMarkListForMonth(y,m,today);
-  });
-  detailYearEl.addEventListener("change", ()=>{
-    const today = startOfToday();
-    const {y,m} = getDetailYM();
-    selectedRange = {year:y, month:m};
-    renderDetailCalendar(y,m,today);
-    renderMarkListForMonth(y,m,today);
-  });
-
-  gridWrapEl.addEventListener("scroll", ()=> placeBugOnMain(livedUnits, true));
-  detailWrapEl.addEventListener("scroll", ()=>{
-    if (detailBugEl.style.display !== "none"){
-      const today = startOfToday();
-      const todayStr = formatDate(today);
-      for (const el of detailGridEl.children){
-        if (el.title === todayStr){
-          placeDetailBug(el);
-          break;
-        }
-      }
-    }
-  });
-
-  window.addEventListener("resize", ()=> refreshAll());
-
-  syncProfileSelect();
-  loadProfileIntoUI(getCurrentProfile());
-
-  // ---------- Help Modal & Onboarding (init after DOM ready) ----------
-  const HELP_SEEN_KEY = "life_grid_v11_help_seen";
-  const ONB_SEEN_KEY  = "life_grid_v11_onboarding_seen";
-
-  function openHelp(){
-    const m = $("helpMask");
-    if (!m) return;
-    m.classList.add("show");
-    m.setAttribute("aria-hidden","false");
-    localStorage.setItem(HELP_SEEN_KEY, "1");
-  }
-  function closeHelp(){
-    const m = $("helpMask");
-    if (!m) return;
-    m.classList.remove("show");
-    m.setAttribute("aria-hidden","true");
-  }
-
-  // ---------- Onboarding ----------
-  const ONB_STEPS = [
-    {
-      title: "你的一生，可以被看见",
-      text: "把人生切成一格一格的小时间，你会更清晰地感受到：自己在哪里，未来还有多少。",
-      hint: "提示：你随时可以点右上角 ℹ️ 再看说明。"
-    },
-    {
-      title: "每一格，代表一段时间",
-      text: "你可以选择按 年 / 月 / 周 来观察人生。灰色是过去，绿色是未来。",
-      hint: "主窗口：灰=过去，绿=未来。"
-    },
-    {
-      title: "🐞 代表“此刻的你”",
-      text: "瓢虫会停在当前时间点附近，并带一点点呼吸与曲线运动，提醒你：时间在流动。",
-      hint: "点击格子，查看下方日历细节。"
-    },
-    {
-      title: "把重要的事标出来",
-      text: "添加里程碑（黄）与提醒（红）。同一天冲突时：过去显示里程碑，今天及未来显示提醒。",
-      hint: "准备好了就开始吧。"
-    }
-  ];
-  let onbStep = 0;
-
-  function buildOnbDots(){
-    const onbDots = $("onbDots");
-    if (!onbDots) return;
-    onbDots.innerHTML = "";
-    for (let i=0;i<ONB_STEPS.length;i++){
-      const d = document.createElement("div");
-      d.className = "stepDot" + (i===onbStep ? " on" : "");
-      onbDots.appendChild(d);
-    }
-  }
-
-  function buildMiniGrid(){
-    const onbMini = $("onbMini");
-    if (!onbMini) return;
-    onbMini.innerHTML = "";
-    const total = 13*10;
-    for (let i=0;i<total;i++){
-      const c = document.createElement("div");
-      onbMini.appendChild(c);
-    }
-    const cells = Array.from(onbMini.children);
-    const paint = (pastN, marksMode)=>{
-      for (let i=0;i<cells.length;i++){
-        cells[i].className = "";
-        if (i < pastN) cells[i].classList.add("x");
-        else cells[i].classList.add("g");
-      }
-      if (marksMode){
-        [18, 29, 63].forEach(i=>cells[i]?.classList.add("m"));
-        [41, 72, 96].forEach(i=>cells[i]?.classList.add("r"));
-      }
-    };
-    if (onbStep===0) paint(0, false);
-    if (onbStep===1) paint(45, false);
-    if (onbStep===2) paint(55, false);
-    if (onbStep===3) paint(55, true);
-  }
-
-  function showOnb(step){
-    onbStep = clamp(step, 0, ONB_STEPS.length-1);
-    const s = ONB_STEPS[onbStep];
-    const onbTitle = $("onbTitle");
-    const onbText  = $("onbText");
-    const onbHint  = $("onbHint");
-    if (onbTitle) onbTitle.textContent = s.title;
-    if (onbText)  onbText.textContent  = s.text;
-    if (onbHint)  onbHint.textContent  = s.hint;
-    buildOnbDots();
-    buildMiniGrid();
-    const nextBtn = $("onbNext");
-    if (nextBtn) nextBtn.textContent = (onbStep === ONB_STEPS.length-1) ? "进入 LifeGrid" : "下一步";
-  }
-
-  function openOnb(force=false){
-    const onbMask = $("onbMask");
-    if (!onbMask) return;
-    if (!force && localStorage.getItem(ONB_SEEN_KEY) === "1") return;
-    onbMask.classList.add("show");
-    onbMask.setAttribute("aria-hidden","false");
-    showOnb(0);
-  }
-  function closeOnb(){
-    const onbMask = $("onbMask");
-    if (!onbMask) return;
-    onbMask.classList.remove("show");
-    onbMask.setAttribute("aria-hidden","true");
-    localStorage.setItem(ONB_SEEN_KEY, "1");
-  }
-
-  function initOverlays(){
-    // Help handlers (now guaranteed elements exist)
-    $("helpBtn")?.addEventListener("click", openHelp);
-    $("helpClose")?.addEventListener("click", closeHelp);
-    $("helpOk")?.addEventListener("click", closeHelp);
-    $("helpMask")?.addEventListener("click", (e)=>{
-      if (e.target && e.target.id === "helpMask") closeHelp();
-    });
-
-    // Onboarding handlers
-    $("onbNext")?.addEventListener("click", ()=>{
-      if (onbStep >= ONB_STEPS.length-1){ closeOnb(); return; }
-      showOnb(onbStep+1);
-    });
-    $("onbSkip")?.addEventListener("click", closeOnb);
-    $("onbMask")?.addEventListener("click", (e)=>{
-      if (e.target && e.target.id === "onbMask") closeOnb();
-    });
-
-    $("reopenOnbBtn")?.addEventListener("click", ()=>{
-      closeHelp();
-      openOnb(true);
-    });
-
-    // Auto-open onboarding on first run
-    setTimeout(()=>openOnb(false), 120);
-  }
-
-  // Run after DOM is fully parsed (modal elements are at the bottom of body)
-  if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", initOverlays, {once:true});
-  } else {
-    initOverlays();
-  }
-
-
+  (function init(){
+    const d = new Date(); d.setFullYear(d.getFullYear()-32);
+    $("dob").value = `${d.getFullYear()}-${fmt2(d.getMonth()+1)}-${fmt2(d.getDate())}`;
+    refresh();
+  })();
 </script>
-
-<!-- Help Modal -->
-<div class="modalMask" id="helpMask" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="帮助">
-    <div class="modalHead">
-      <div class="t">ℹ️ 帮助 · LifeGrid 使用说明</div>
-      <div class="modalClose" id="helpClose" title="关闭">✕</div>
-    </div>
-    <div class="modalBody">
-      <p><b>LifeGrid（人生格子）</b> 是一个用于可视化「已走过的人生」与「剩余时间」的时间反思与规划工具。每一个格子代表你生命中的一小段时间。</p>
-
-      <h3>1) 读懂主窗口</h3>
-      <ul>
-        <li><b>灰色</b>：已经走过的时间</li>
-        <li><b>绿色</b>：未来的时间</li>
-        <li><b>🐞</b>：当前时间点（你正在这里）</li>
-        <li>点击任意格子：下方会显示对应月份的<b>日历细节</b></li>
-      </ul>
-
-      <h3>2) 里程碑 & 提醒</h3>
-      <ul>
-        <li><span style="color:#f1c40f"><b>里程碑（黄）</b></span>：已经发生/值得纪念的事件</li>
-        <li><span style="color:#ff4d4f"><b>提醒（红）</b></span>：今天及未来需要关注/行动的事件</li>
-        <li>同一天同时存在：<b>过去</b>显示里程碑色；<b>今天及未来</b>显示提醒色</li>
-        <li>事件可在列表里<b>单条删除</b>（右侧 ✕）</li>
-      </ul>
-
-      <h3>3) 细节日历</h3>
-      <ul>
-        <li>日历按真实周/日排布</li>
-        <li>如果当前月份包含今天，会显示🐞在“今天”那一格</li>
-        <li>可用下拉切换年月</li>
-      </ul>
-
-      <h3>4) 今天的时间条</h3>
-      <ul>
-        <li>三条分别表示：24 小时 / 60 分钟 / 60 秒</li>
-        <li>🐞实时爬行代表当前时间进度</li>
-      </ul>
-
-      <h3>隐私与数据</h3>
-      <p class="muted">所有数据仅保存在你的浏览器本地（LocalStorage），不会上传到网络。清除浏览器数据会删除保存的档案与事件。</p>
-    </div>
-    <div class="modalActions">
-      <button class="ghost" id="reopenOnbBtn">重新查看新手引导</button>
-      <button class="primary" id="helpOk">我知道了</button>
-    </div>
-  </div>
-</div>
-
-<!-- Onboarding -->
-<div class="onbMask" id="onbMask" aria-hidden="true">
-  <div class="onb" role="dialog" aria-modal="true" aria-label="新手引导">
-    <div class="onbTop">
-      <div class="brand">LifeGrid · 人生格子</div>
-      <div class="onbSteps" id="onbDots"></div>
-    </div>
-
-    <div class="onbBody">
-      <div>
-        <h2 class="onbH" id="onbTitle">你的一生，可以被看见</h2>
-        <p class="onbP" id="onbText">把人生切成一格一格的小时间，你会更清晰地感受到：自己在哪里，未来还有多少。</p>
-      </div>
-
-      <div class="onbCard">
-        <div class="onbMiniGrid" id="onbMini"></div>
-        <svg class="onbBug" viewBox="0 0 100 100" aria-hidden="true">
-          <circle cx="76" cy="50" r="12" fill="#101018"/>
-          <ellipse cx="46" cy="50" rx="28" ry="24" fill="#d11"/>
-          <path d="M46 26 C46 26,46 74,46 74" stroke="#111" stroke-width="4" />
-          <circle cx="36" cy="42" r="4" fill="#111"/>
-          <circle cx="30" cy="58" r="4" fill="#111"/>
-          <circle cx="56" cy="42" r="4" fill="#111"/>
-          <circle cx="62" cy="58" r="4" fill="#111"/>
-          <path d="M82 42 C90 34,94 30,96 26" stroke="#111" stroke-width="3" fill="none"/>
-          <path d="M82 58 C90 66,94 70,96 74" stroke="#111" stroke-width="3" fill="none"/>
-        </svg>
-      </div>
-    </div>
-
-    <div class="onbBottom">
-      <div class="hint" id="onbHint">提示：你随时可以点右上角 ℹ️ 再看说明。</div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="ghost" id="onbSkip">跳过</button>
-        <button class="primary" id="onbNext">下一步</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
